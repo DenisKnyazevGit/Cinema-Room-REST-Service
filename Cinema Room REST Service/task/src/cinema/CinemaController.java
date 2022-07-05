@@ -1,22 +1,8 @@
 package cinema;
 
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
-
-class ErrorBody {
-    private String error;
-
-    public ErrorBody(String error) {
-        this.error = error;
-    }
-
-    public String getError() {
-        return error;
-    }
-}
 
 @RestController
 public class CinemaController {
@@ -28,7 +14,6 @@ public class CinemaController {
 
     @GetMapping("/seats")
     public ResponseEntity getSeats() {
-        // HttpHeaders headers = new HttpHeaders();
         ResponseEntity cinema = new ResponseEntity<>(this.cinema, null, HttpStatus.OK);
 
         return cinema;
@@ -38,10 +23,23 @@ public class CinemaController {
     public ResponseEntity postPurchase(@RequestBody Seat seat) {
         ResponseEntity responseEntity;
         try {
-            Seat s = this.cinema.purchaseSeat(seat.getRow(), seat.getColumn());
-            responseEntity =  new ResponseEntity<>(s, null, HttpStatus.OK);
-        } catch (SeatPurchaseException e) {
-            responseEntity = new ResponseEntity<>(new ErrorBody(e.getMessage()), null, HttpStatus.BAD_REQUEST);
+            PurchaseResponse r = this.cinema.purchaseTicket(seat.getRow(), seat.getColumn());
+            responseEntity =  new ResponseEntity<>(r, null, HttpStatus.OK);
+        } catch (CinemaCustomException e) {
+            responseEntity = new ResponseEntity<>(new CinemaCustomError(e.getMessage()), null, HttpStatus.BAD_REQUEST);
+        }
+
+        return responseEntity;
+    }
+
+    @PostMapping("/return")
+    public ResponseEntity postReturn(@RequestBody Ticket ticket) {
+        ResponseEntity responseEntity;
+        try {
+            ReturnResponse r = this.cinema.returnTicket(ticket.getToken());
+            responseEntity =  new ResponseEntity<>(r, null, HttpStatus.OK);
+        } catch (CinemaCustomException e) {
+            responseEntity = new ResponseEntity<>(new CinemaCustomError(e.getMessage()), null, HttpStatus.BAD_REQUEST);
         }
 
         return responseEntity;
