@@ -1,43 +1,8 @@
 package cinema;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
-
-class PurchaseResponse {
-    // Токен билета
-    private String token;
-    // Купленное место
-    private Seat ticket;
-
-    public PurchaseResponse(Ticket ticket) {
-        this.ticket = ticket.getSeat();
-        this.token = ticket.getToken();
-    }
-
-    public String getToken() {
-        return this.token;
-    }
-
-    public Seat getTicket() {
-        return this.ticket;
-    }
-}
-
-class ReturnResponse {
-    // Купленное место
-    private Seat returnedTicket;
-
-    public ReturnResponse(Ticket ticket) {
-        this.returnedTicket = ticket.getSeat();
-    }
-
-    @JsonProperty("returned_ticket")
-    public Seat getReturnedTicket() {
-        return this.returnedTicket;
-    }
-}
 
 public class Cinema {
     // Количество рядов в кинотеатре
@@ -127,5 +92,9 @@ public class Cinema {
         this.allTickets.remove(returnedTicket.getToken());
 
         return new ReturnResponse(returnedTicket);
+    }
+
+    public StatsResponse stats() {
+        return new StatsResponse(this.getAvailableSeats(), this.allTickets);
     }
 }

@@ -24,7 +24,7 @@ public class CinemaController {
         ResponseEntity responseEntity;
         try {
             PurchaseResponse r = this.cinema.purchaseTicket(seat.getRow(), seat.getColumn());
-            responseEntity =  new ResponseEntity<>(r, null, HttpStatus.OK);
+            responseEntity = new ResponseEntity<>(r, null, HttpStatus.OK);
         } catch (CinemaCustomException e) {
             responseEntity = new ResponseEntity<>(new CinemaCustomError(e.getMessage()), null, HttpStatus.BAD_REQUEST);
         }
@@ -37,11 +37,20 @@ public class CinemaController {
         ResponseEntity responseEntity;
         try {
             ReturnResponse r = this.cinema.returnTicket(ticket.getToken());
-            responseEntity =  new ResponseEntity<>(r, null, HttpStatus.OK);
+            responseEntity = new ResponseEntity<>(r, null, HttpStatus.OK);
         } catch (CinemaCustomException e) {
             responseEntity = new ResponseEntity<>(new CinemaCustomError(e.getMessage()), null, HttpStatus.BAD_REQUEST);
         }
 
         return responseEntity;
+    }
+
+    @PostMapping("/stats")
+    public ResponseEntity postStat(@RequestParam(required = false) String password) {
+        if (password == null || !password.equals("super_secret")) {
+            return new ResponseEntity<>(new CinemaCustomError("The password is wrong!"), null, HttpStatus.UNAUTHORIZED);
+        }
+
+        return new ResponseEntity<>(this.cinema.stats(), null, HttpStatus.OK);
     }
 }
